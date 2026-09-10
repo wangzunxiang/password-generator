@@ -1,5 +1,7 @@
 # 等保三级合规密码生成器 (PasswordGenerator)
 
+![界面截图](screenshot.png)
+
 依据 **GB/T 22239-2019《信息安全技术 网络安全等级保护基本要求》** 三级等保口令策略要求编写的图形界面密码生成工具（Python + Tkinter，PyInstaller 打包为 Windows 单文件 .exe）。
 
 ## 生成规则
