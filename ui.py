@@ -13,7 +13,7 @@ from tkinter import messagebox
 import password_core as core
 
 APP_TITLE = "等保三级合规密码生成器"
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.1.1"
 
 # ── 配色（浅色专业主题）─────────────────────────────
 C_BG = "#f5f7fa"        # 窗口背景

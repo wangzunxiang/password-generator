@@ -64,6 +64,7 @@ def generate_password(length, options):
     length:  期望长度（不足类型数时自动补齐）
     options: dict，如 {"upper": True, "lower": True, "digit": True, "special": True}
     每类勾选字符至少出现 1 个，secrets 安全洗牌。
+    生成后做弱特征复查（连续序列/重复/弱口令词根），命中则重掷，最多 100 次。
     """
     keys = selected_types(options)
     if not keys:
@@ -71,14 +72,20 @@ def generate_password(length, options):
     length = max(length, len(keys))
     pools = [TYPE_RANGES[k] for k in keys]
     all_chars = "".join(pools)
-    # 每类至少取一个，保证类型覆盖
-    chars = [secrets.choice(p) for p in pools]
-    chars += [secrets.choice(all_chars) for _ in range(length - len(chars))]
-    # 密码学安全洗牌 (Fisher-Yates + secrets.randbelow)
-    for i in range(len(chars) - 1, 0, -1):
-        j = secrets.randbelow(i + 1)
-        chars[i], chars[j] = chars[j], chars[i]
-    return "".join(chars)
+    for _attempt in range(100):
+        # 每类至少取一个，保证类型覆盖
+        chars = [secrets.choice(p) for p in pools]
+        chars += [secrets.choice(all_chars) for _ in range(length - len(chars))]
+        # 密码学安全洗牌 (Fisher-Yates + secrets.randbelow)
+        for i in range(len(chars) - 1, 0, -1):
+            j = secrets.randbelow(i + 1)
+            chars[i], chars[j] = chars[j], chars[i]
+        pwd = "".join(chars)
+        ok, issues = check_password(pwd)
+        # 仅当勾选类型足以达标时复查，避免少于 3 类时无谓重掷
+        if ok or len(keys) < MIN_TYPES:
+            return pwd
+    return pwd
 
 
 def _consecutive_issue(pwd):

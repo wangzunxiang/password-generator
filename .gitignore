@@ -1,4 +1,6 @@
 build/
+dist/
+work/
 __pycache__/
 *.spec
 *.pyc
